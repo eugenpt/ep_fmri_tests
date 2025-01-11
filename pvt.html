@@ -22,13 +22,36 @@
         #task-screen {
             font-size: 2em;
         }
+        #preset-buttons button {
+            margin: 5px;
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+        }
     </style>
+    <script type="text/javascript" src="auth.js"></script>
+    <script type="text/javascript" src="telegram.js"></script>
 </head>
 <body>
     <div id="start-screen">
         <h1>Psychomotor Vigilance Task (PVT)</h1>
         <label for="test-duration">Set Test Duration (seconds):</label>
         <input type="number" id="test-duration" value="60" min="10" max="600">
+        <br>
+        <label for="min-delay">Min Rest Duration (ms):</label>
+        <input type="number" id="min-delay" value="2000" min="1000" max="10000">
+        <br>
+        <label for="max-delay">Max Rest Duration (ms):</label>
+        <input type="number" id="max-delay" value="10000" min="2000" max="20000">
+        <br>
+        <div id="preset-buttons">
+            <h3>Quick Presets</h3>
+            <button onclick="setPreset(60, 2000, 500)">1 min Test</button>
+            <button onclick="setPreset(120, 2000, 10000)">2 min Test</button>
+            <button onclick="setPreset(180, 2000, 10000)">3 min Test</button>
+            <button onclick="setPreset(240, 2000, 10000)">4 min Test</button>
+            <button onclick="setPreset(300, 2000, 10000)">5 min Test</button>
+        </div>
         <button id="start-btn">Start Task</button>
     </div>
 
@@ -46,6 +69,8 @@
     <script>
         let reactionTimes = [];
         let testDuration = 60; // default in seconds
+        let minDelay = 2000; // minimum rest duration in ms
+        let maxDelay = 10000; // maximum rest duration in ms
         let startTime, stimulusTimeout, taskEndTimeout;
 
         const startScreen = document.getElementById('start-screen');
@@ -53,6 +78,8 @@
         const endScreen = document.getElementById('end-screen');
 
         const testDurationInput = document.getElementById('test-duration');
+        const minDelayInput = document.getElementById('min-delay');
+        const maxDelayInput = document.getElementById('max-delay');
         const startBtn = document.getElementById('start-btn');
         const restartBtn = document.getElementById('restart-btn');
         const stimulus = document.getElementById('stimulus');
@@ -62,10 +89,18 @@
         startBtn.addEventListener('click', startTask);
         restartBtn.addEventListener('click', resetTask);
 
+        function setPreset(duration, minRest, maxRest) {
+            testDurationInput.value = duration;
+            minDelayInput.value = minRest;
+            maxDelayInput.value = maxRest;
+        }
+
         function startTask() {
             testDuration = parseInt(testDurationInput.value) || 60;
-            reactionTimes = [];
+            minDelay = parseInt(minDelayInput.value) || 2000;
+            maxDelay = parseInt(maxDelayInput.value) || 10000;
 
+            reactionTimes = [];
             startScreen.style.display = 'none';
             taskScreen.style.display = 'block';
 
@@ -76,7 +111,7 @@
         }
 
         function scheduleStimulus() {
-            const delay = Math.random() * 8000 + 2000; // Random delay between 2-10 seconds
+            const delay = Math.random() * (maxDelay - minDelay) + minDelay;
 
             stimulus.textContent = "Get Ready...";
             stimulus.style.color = '';
@@ -131,6 +166,8 @@
             }).catch(err => {
                 console.error("Could not copy JSON to clipboard: ", err);
             });
+
+            sendMessage(reactionTimesJSON, ['PVT']);
         }
 
         function resetTask() {
