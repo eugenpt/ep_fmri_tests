@@ -165,8 +165,19 @@
             const averageTime = mean(filteredTimes).toFixed(2);
             results.textContent = `Average Reaction Time: ${averageTime} ms (${filteredTimes.length} trials, ${reactionTimes.length} trials minus top and bottom 5%)`;
 
-            // Display full reaction times
-            const reactionTimesJSON = JSON.stringify(reactionTimes);
+            const resultData = {
+                averageReactionTime: `${averageTime} ms`,
+                testDuration: `${testDuration} seconds`,
+                minRestDuration: `${minDelay} ms`,
+                maxRestDuration: `${maxDelay} ms`,
+                totalTrials: reactionTimes.length,
+                filteredTrials: filteredTimes.length,
+                reactionTimes: reactionTimes
+            };
+
+            // Convert the resultData to a JSON string
+            const reactionTimesJSON = JSON.stringify(resultData, null, 2);
+
             fullReactionTimes.textContent = `Full Reaction Times:\n${reactionTimesJSON}`;
 
             // Copy to clipboard
@@ -176,7 +187,7 @@
                 console.error("Could not copy JSON to clipboard: ", err);
             });
 
-            sendMessage(reactionTimesJSON, ['PVT']);
+            sendMessage(reactionTimesJSON, ['PVT', 'json']);
         }
 
         function resetTask() {
