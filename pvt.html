@@ -34,12 +34,12 @@
 
     <div id="task-screen">
         <p id="stimulus">Get Ready...</p>
-        <button id="response-btn" style="display: none;">Click!</button>
     </div>
 
     <div id="end-screen">
         <h1>Task Complete</h1>
         <p id="results"></p>
+        <pre id="full-reaction-times"></pre>
         <button id="restart-btn">Restart</button>
     </div>
 
@@ -55,9 +55,9 @@
         const testDurationInput = document.getElementById('test-duration');
         const startBtn = document.getElementById('start-btn');
         const restartBtn = document.getElementById('restart-btn');
-        const responseBtn = document.getElementById('response-btn');
         const stimulus = document.getElementById('stimulus');
         const results = document.getElementById('results');
+        const fullReactionTimes = document.getElementById('full-reaction-times');
 
         startBtn.addEventListener('click', startTask);
         restartBtn.addEventListener('click', resetTask);
@@ -79,30 +79,27 @@
             const delay = Math.random() * 8000 + 2000; // Random delay between 2-10 seconds
 
             stimulus.textContent = "Get Ready...";
-            stimulus.style.color='';
-            responseBtn.style.display = 'none';
+            stimulus.style.color = '';
 
             taskScreen.onmousedown = () => {};
-            
+
             clearTimeout(stimulusTimeout);
 
             stimulusTimeout = setTimeout(() => {
                 stimulus.textContent = "Click Now!";
-                stimulus.style.color='red';
+                stimulus.style.color = 'red';
 
-                taskScreen.onmousedown = () => { //rstimulus.onclick = responseBtn.onclick = 
+                taskScreen.onmousedown = () => {
                     const reactionTime = Date.now() - startTime;
-                    console.log(reactionTime)
                     reactionTimes.push(reactionTime);
                     scheduleStimulus();
                 };
 
-                // responseBtn.style.display = 'block';
                 startTime = Date.now();
             }, delay);
         }
 
-        function mean(arr){
+        function mean(arr) {
             return arr.length
                 ? (arr.reduce((a, b) => a + b, 0) / arr.length)
                 : 0;
@@ -116,10 +113,24 @@
             endScreen.style.display = 'block';
 
             const sortedTimes = [...reactionTimes].sort((a, b) => a - b);
-            const filteredTimes = sortedTimes.slice(Math.ceil(reactionTimes.length*0.05),Math.floor(reactionTimes.length*0.95))
+            const filteredTimes = sortedTimes.slice(
+                Math.ceil(reactionTimes.length * 0.05),
+                Math.floor(reactionTimes.length * 0.95)
+            );
 
             const averageTime = mean(filteredTimes).toFixed(2);
-            results.textContent = `Average Reaction Time: ${averageTime} ms (${filteredTimes.length} trials,  ${reactionTimes.length} trials minus top and bottom 5%)`;
+            results.textContent = `Average Reaction Time: ${averageTime} ms (${filteredTimes.length} trials, ${reactionTimes.length} trials minus top and bottom 5%)`;
+
+            // Display full reaction times
+            const reactionTimesJSON = JSON.stringify(reactionTimes, null, 2);
+            fullReactionTimes.textContent = `Full Reaction Times:\n${reactionTimesJSON}`;
+
+            // Copy to clipboard
+            navigator.clipboard.writeText(reactionTimesJSON).then(() => {
+                alert("Reaction times JSON copied to clipboard!");
+            }).catch(err => {
+                console.error("Could not copy JSON to clipboard: ", err);
+            });
         }
 
         function resetTask() {
