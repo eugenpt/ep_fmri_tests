@@ -18,14 +18,23 @@
         }
         #task-screen, #end-screen {
             display: none;
+            user-select: none
         }
         #task-screen {
             font-size: 2em;
+            user-select: none
         }
         #preset-buttons button {
             margin: 5px;
             padding: 10px 20px;
             font-size: 1em;
+            cursor: pointer;
+        }
+        #start-btn {
+            margin: 5px;
+            padding: 10px 20px;
+            font-size: 1em;
+            font-weight: bold;
             cursor: pointer;
         }
     </style>
@@ -46,7 +55,7 @@
         <br>
         <div id="preset-buttons">
             <h3>Quick Presets</h3>
-            <button onclick="setPreset(60, 2000, 500)">1 min Test</button>
+            <button onclick="setPreset(60, 2000, 5000)">1 min Test</button>
             <button onclick="setPreset(120, 2000, 10000)">2 min Test</button>
             <button onclick="setPreset(180, 2000, 10000)">3 min Test</button>
             <button onclick="setPreset(240, 2000, 10000)">4 min Test</button>
@@ -157,7 +166,7 @@
             results.textContent = `Average Reaction Time: ${averageTime} ms (${filteredTimes.length} trials, ${reactionTimes.length} trials minus top and bottom 5%)`;
 
             // Display full reaction times
-            const reactionTimesJSON = JSON.stringify(reactionTimes, null, 2);
+            const reactionTimesJSON = JSON.stringify(reactionTimes);
             fullReactionTimes.textContent = `Full Reaction Times:\n${reactionTimesJSON}`;
 
             // Copy to clipboard
