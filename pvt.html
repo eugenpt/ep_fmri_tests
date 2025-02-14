@@ -77,10 +77,16 @@
 
     <script>
         let reactionTimes = [];
+        let delays = [];
+        let clickTimes = [];
         let testDuration = 60; // default in seconds
         let minDelay = 2000; // minimum rest duration in ms
         let maxDelay = 10000; // maximum rest duration in ms
         let startTime, stimulusTimeout, taskEndTimeout;
+        let taskStartTime;
+        let _EVENTS = [];
+
+        let CLICK_NOW = false;
 
         const startScreen = document.getElementById('start-screen');
         const taskScreen = document.getElementById('task-screen');
@@ -95,8 +101,31 @@
         const results = document.getElementById('results');
         const fullReactionTimes = document.getElementById('full-reaction-times');
 
+
+
         startBtn.addEventListener('click', startTask);
         restartBtn.addEventListener('click', resetTask);
+
+        taskScreen.addEventListener('mousedown', onTaskScreenMouseDown);
+
+        function log_event(event){
+            _EVENTS.push([event,  (Date.now() - taskStartTime)]);
+//            _EVENTS.push(event + ' ' + (Date.now() - taskStartTime));
+        }
+
+        function onTaskScreenMouseDown() {
+            var now = Date.now();
+            clickTimes.push(now - taskStartTime);
+            console.log(clickTimes);
+            if (CLICK_NOW){
+                log_event('click');
+                const reactionTime = now - startTime;
+                reactionTimes.push(reactionTime);
+                scheduleStimulus();
+            } else {
+                log_event('false_click');
+            }
+        }
 
         function setPreset(duration, minRest, maxRest) {
             testDurationInput.value = duration;
@@ -110,36 +139,38 @@
             maxDelay = parseInt(maxDelayInput.value) || 10000;
 
             reactionTimes = [];
+            delays = [];
+            clickTimes = [];
+
             startScreen.style.display = 'none';
             taskScreen.style.display = 'block';
 
+            taskStartTime = Date.now();
             startTime = Date.now();
             scheduleStimulus();
 
             taskEndTimeout = setTimeout(endTask, testDuration * 1000);
         }
 
+
+
         function scheduleStimulus() {
             const delay = Math.random() * (maxDelay - minDelay) + minDelay;
 
+            delays.push(Math.round(delay));
+
             stimulus.textContent = "Get Ready...";
             stimulus.style.color = '';
-
-            taskScreen.onmousedown = () => {};
+            CLICK_NOW = false;
 
             clearTimeout(stimulusTimeout);
 
             stimulusTimeout = setTimeout(() => {
                 stimulus.textContent = "Click Now!";
                 stimulus.style.color = 'red';
-
-                taskScreen.onmousedown = () => {
-                    const reactionTime = Date.now() - startTime;
-                    reactionTimes.push(reactionTime);
-                    scheduleStimulus();
-                };
-
+                CLICK_NOW = true;
                 startTime = Date.now();
+                log_event('stimulus');
             }, delay);
         }
 
@@ -149,12 +180,36 @@
                 : 0;
         }
 
+        function customFormatter(obj) {
+          function formatValue(value, indent = '') {
+            if (Array.isArray(value)) {
+              const items = value.map(item => 
+                formatValue(item, indent)
+              ).join(', ');
+              return `[${items}]`;
+            }
+            if (typeof value === 'object' && value !== null) {
+              const nextIndent = indent + '  ';
+              const items = Object.entries(value).map(([key, val]) => 
+                `${nextIndent}"${key}": ${formatValue(val, nextIndent)}`
+              ).join(',\n');
+              return `{\n${items}\n${indent}}`;
+            }
+            if (typeof value === 'string') return `"${value}"`;
+            return value;
+          }
+          
+          return formatValue(obj);
+        }
+
+
         function endTask() {
             clearTimeout(stimulusTimeout);
             clearTimeout(taskEndTimeout);
 
             taskScreen.style.display = 'none';
             endScreen.style.display = 'block';
+            CLICK_NOW = false;
 
             const sortedTimes = [...reactionTimes].sort((a, b) => a - b);
             const filteredTimes = sortedTimes.slice(
@@ -166,17 +221,19 @@
             results.textContent = `Average Reaction Time: ${averageTime} ms (${filteredTimes.length} trials, ${reactionTimes.length} trials minus top and bottom 5%)`;
 
             const resultData = {
+                test_datetime: (new Date).toLocaleString(),
                 averageReactionTime: `${averageTime} ms`,
                 testDuration: `${testDuration} seconds`,
                 minRestDuration: `${minDelay} ms`,
                 maxRestDuration: `${maxDelay} ms`,
                 totalTrials: reactionTimes.length,
                 filteredTrials: filteredTimes.length,
+                events: _EVENTS,
                 reactionTimes: reactionTimes
             };
 
             // Convert the resultData to a JSON string
-            const reactionTimesJSON = JSON.stringify(resultData, null, 2);
+            const reactionTimesJSON = customFormatter(resultData);
 
             fullReactionTimes.textContent = `Full Reaction Times:\n${reactionTimesJSON}`;
 
