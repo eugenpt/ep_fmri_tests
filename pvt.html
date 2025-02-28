@@ -1,421 +1,569 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Psychomotor Vigilance Task (PVT) & PANAS</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            height: 100vh;
-            background-color: #f4f4f9;
-        }
-        #task-screen, #end-screen, #panas-screen {
-            display: none;
-            user-select: none;
-        }
-        #task-screen {
-            font-size: 2em;
-        }
-        #panas-screen {
-            font-size: 1.2em;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        #preset-buttons button {
-            margin: 5px;
-            padding: 10px 20px;
-            font-size: 1em;
-            cursor: pointer;
-        }
-        #start-btn, #start-panas-btn, #start-combined-btn {
-            margin: 5px;
-            padding: 10px 20px;
-            font-size: 1em;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        #panas-header {
-            font-size: 1em;
-            margin-bottom: 20px;
-        }
-        #panas-word {
-            font-size: 2.5em;
-            margin: 20px 0;
-        }
-        #panas-word-en, #panas-word-ru {
-            display: block;
-        }
-        .panas-options-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-wrap: nowrap;
-            margin-top: 20px;
-        }
-        .panas-option-btn {
-            margin: 0 10px;
-            padding: 10px;
-            font-size: 1em;
-            cursor: pointer;
-            background-color: #e0e0e0;
-            border: none;
-            border-radius: 5px;
-            width: 150px;
-            height: 80px;
-            text-align: center;
-            white-space: normal;
-            line-height: 1.2;
-        }
-        .panas-option-btn:hover {
-            background-color: #d0d0d0;
-        }
-        .panas-option-en, .panas-option-ru {
-            display: block;
-        }
-    </style>
-    <script type="text/javascript" src="auth.js"></script>
-    <script type="text/javascript" src="telegram.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Psychomotor Vigilance Task (PVT), PANAS & PHQ-9</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .container {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 800px;
+      width: 100%;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    h1 {
+      margin-top: 0;
+    }
+    button {
+      border: none;
+      border-radius: 8px;
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      font-size: 1em;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      margin: 5px;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    #preset-buttons button {
+      background-color: #2196F3;
+    }
+    #preset-buttons button:hover {
+      background-color: #1976D2;
+    }
+    input[type="number"] {
+      padding: 5px;
+      margin: 5px;
+      font-size: 1em;
+      width: 80px;
+    }
+    /* Hide screens by default */
+    #task-screen, #panas-screen, #phq9-screen, #end-screen {
+      display: none;
+      user-select: none;
+    }
+    /* PVT screen */
+    #task-screen {
+      font-size: 2em;
+    }
+    /* PANAS and PHQ-9 screens */
+    #panas-screen, #phq9-screen {
+      font-size: 1.2em;
+    }
+    #panas-word, #phq9-question {
+      font-size: 2.5em;
+      margin: 20px 0;
+    }
+    .panas-options-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .panas-option-btn {
+      margin: 5px;
+      padding: 10px;
+      font-size: 1em;
+      cursor: pointer;
+      background-color: #b0bec5;
+      border: 2px solid #78909c;
+      border-radius: 5px;
+      width: 90%;
+      max-width: 300px;
+      text-align: center;
+      white-space: normal;
+      line-height: 1.2;
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+      color: #000;
+    }
+    .panas-option-btn:hover {
+      background-color: #90a4ae;
+      border-color: #546e7a;
+    }
+    #results {
+      font-size: 1.2em;
+      margin: 20px 0;
+    }
+    pre {
+      text-align: left;
+      background: #f4f4f9;
+      padding: 10px;
+      border-radius: 5px;
+      overflow-x: auto;
+    }
+  </style>
+  <script type="text/javascript" src="auth.js"></script>
+  <script type="text/javascript" src="telegram.js"></script>
 </head>
 <body>
-    <div id="start-screen">
-        <h1>Psychomotor Vigilance Task (PVT) & PANAS</h1>
-        <label for="test-duration">Set Test Duration (seconds):</label>
-        <input type="number" id="test-duration" value="60" min="10" max="600">
-        <br>
-        <label for="min-delay">Min Rest Duration (ms):</label>
-        <input type="number" id="min-delay" value="2000" min="1000" max="10000">
-        <br>
-        <label for="max-delay">Max Rest Duration (ms):</label>
-        <input type="number" id="max-delay" value="10000" min="2000" max="20000">
-        <br>
-        <div id="preset-buttons">
-            <h3>Quick Presets</h3>
-            <button onclick="setPreset(60, 2000, 5000)">1 min Test</button>
-            <button onclick="setPreset(120, 2000, 10000)">2 min Test</button>
-            <button onclick="setPreset(180, 2000, 10000)">3 min Test</button>
-            <button onclick="setPreset(240, 2000, 10000)">4 min Test</button>
-            <button onclick="setPreset(300, 2000, 10000)">5 min Test</button>
-        </div>
-        <button id="start-btn">Start PVT</button>
-        <button id="start-panas-btn">Start PANAS</button>
-        <button id="start-combined-btn">Start Combined (PANAS + PVT)</button>
+  <!-- Start Screen -->
+  <div class="container" id="start-screen">
+    <h1>Psychomotor Vigilance Task (PVT), PANAS & PHQ-9</h1>
+    <div>
+      <label for="test-duration">Set Test Duration (seconds):</label>
+      <input type="number" id="test-duration" value="60" min="10" max="600">
     </div>
-
-    <div id="task-screen">
-        <p id="stimulus">Get Ready...</p>
+    <div>
+      <label for="min-delay">Min Rest Duration (ms):</label>
+      <input type="number" id="min-delay" value="2000" min="1000" max="10000">
     </div>
-
-    <div id="panas-screen">
-        <p id="panas-header">Indicate how you feel right now / Укажите, как вы чувствуете себя прямо сейчас</p>
-        <div id="panas-word">
-            <span id="panas-word-en"></span>
-            <span id="panas-word-ru"></span>
-        </div>
-        <div id="panas-options" class="panas-options-container"></div>
+    <div>
+      <label for="max-delay">Max Rest Duration (ms):</label>
+      <input type="number" id="max-delay" value="10000" min="2000" max="20000">
     </div>
-
-    <div id="end-screen">
-        <h1>Task Complete</h1>
-        <p id="results"></p>
-        <pre id="full-reaction-times"></pre>
-        <button id="restart-btn">Restart</button>
+    <div id="preset-buttons">
+      <h3>Quick Presets</h3>
+      <button onclick="setPreset(60, 2000, 5000)">1 min Test</button>
+      <button onclick="setPreset(120, 2000, 10000)">2 min Test</button>
+      <button onclick="setPreset(180, 2000, 10000)">3 min Test</button>
+      <button onclick="setPreset(240, 2000, 10000)">4 min Test</button>
+      <button onclick="setPreset(300, 2000, 10000)">5 min Test</button>
     </div>
+    <div>
+      <button id="start-btn">Start PVT</button>
+      <button id="start-panas-btn">Start PANAS</button>
+      <button id="start-combined-btn">Start Combined (PANAS + PVT)</button>
+      <button id="start-phq9-btn">Start PHQ-9</button>
+    </div>
+  </div>
 
-    <script>
-        let reactionTimes = [];
-        let delays = [];
-        let clickTimes = [];
-        let testDuration = 60;
-        let minDelay = 2000;
-        let maxDelay = 10000;
-        let startTime, stimulusTimeout, taskEndTimeout;
-        let taskStartTime;
-        let _EVENTS = [];
-        let CLICK_NOW = false;
-        let panasResponses = []; // Changed to array
-        let panasStartTime;
-        let isCombinedTest = false;
-        let currentPanasIndex = 0;
-        let currentPanasItem = null;
+  <!-- Task Screen (PVT) -->
+  <div class="container" id="task-screen">
+    <p id="stimulus">Get Ready...</p>
+  </div>
 
-        const startScreen = document.getElementById('start-screen');
-        const taskScreen = document.getElementById('task-screen');
-        const panasScreen = document.getElementById('panas-screen');
-        const endScreen = document.getElementById('end-screen');
+  <!-- PANAS Screen -->
+  <div class="container" id="panas-screen">
+    <p id="panas-header">Indicate how you feel right now / Укажите, как вы чувствуете себя прямо сейчас</p>
+    <div id="panas-word">
+      <span id="panas-word-en"></span><br>
+      <span id="panas-word-ru"></span>
+    </div>
+    <div id="panas-options" class="panas-options-container"></div>
+  </div>
 
-        const testDurationInput = document.getElementById('test-duration');
-        const minDelayInput = document.getElementById('min-delay');
-        const maxDelayInput = document.getElementById('max-delay');
-        const startBtn = document.getElementById('start-btn');
-        const startPanasBtn = document.getElementById('start-panas-btn');
-        const startCombinedBtn = document.getElementById('start-combined-btn');
-        const restartBtn = document.getElementById('restart-btn');
-        const stimulus = document.getElementById('stimulus');
-        const results = document.getElementById('results');
-        const fullReactionTimes = document.getElementById('full-reaction-times');
-        const panasWordEn = document.getElementById('panas-word-en');
-        const panasWordRu = document.getElementById('panas-word-ru');
-        const panasOptionsDiv = document.getElementById('panas-options');
+  <!-- PHQ-9 Screen -->
+  <div class="container" id="phq9-screen">
+    <p id="phq9-header">PHQ-9: How often have you been bothered by the following problems over the past 2 weeks?<br>
+    PHQ-9: Как часто вас беспокоили следующие проблемы за последние 2 недели?</p>
+    <div id="phq9-question">
+      <span id="phq9-question-en"></span><br>
+      <span id="phq9-question-ru"></span>
+    </div>
+    <div id="phq9-options" class="panas-options-container"></div>
+  </div>
 
-        const PANAS_ITEMS = [
-            { en: "Interested", ru: "Увлеченный" },
-            { en: "Distressed", ru: "Подавленный" },
-            { en: "Excited", ru: "Радостный" },
-            { en: "Upset", ru: "Расстроенный" },
-            { en: "Strong", ru: "Полный сил" },
-            { en: "Guilty", ru: "Виноватый" },
-            { en: "Scared", ru: "Испуганный" },
-            { en: "Hostile", ru: "Злой" },
-            { en: "Enthusiastic", ru: "Заинтересованный" },
-            { en: "Proud", ru: "Уверенный" },
-            { en: "Irritable", ru: "Раздраженный" },
-            { en: "Alert", ru: "Сосредоточенный" },
-            { en: "Ashamed", ru: "Стыдящийся" },
-            { en: "Inspired", ru: "Вдохновленный" },
-            { en: "Nervous", ru: "Нервный" },
-            { en: "Determined", ru: "Решительный" },
-            { en: "Attentive", ru: "Внимательный" },
-            { en: "Jittery", ru: "Беспокойный" },
-            { en: "Active", ru: "Бодрый" },
-            { en: "Afraid", ru: "Тревожный" }
-        ];
+  <!-- End Screen -->
+  <div class="container" id="end-screen">
+    <h1>Task Complete</h1>
+    <p id="results"></p>
+    <pre id="full-reaction-times"></pre>
+    <button id="restart-btn">Restart</button>
+  </div>
 
-        const PANAS_OPTIONS = [
-            { value: 1, en: "Very slightly or not at all", ru: "Почти или совсем нет" },
-            { value: 2, en: "A little", ru: "Немного" },
-            { value: 3, en: "Moderately", ru: "Умеренно" },
-            { value: 4, en: "Quite a bit", ru: "Значительно" },
-            { value: 5, en: "Extremely", ru: "Очень сильно" }
-        ];
+  <script>
+    // Global Variables
+    let reactionTimes = [];
+    let delays = [];
+    let clickTimes = [];
+    let testDuration = 60;
+    let minDelay = 2000;
+    let maxDelay = 10000;
+    let startTime, stimulusTimeout, taskEndTimeout;
+    let taskStartTime;
+    let _EVENTS = [];
+    let CLICK_NOW = false;
+    let panasResponses = [];
+    let panasStartTime;
+    let isCombinedTest = false;
+    let currentPanasIndex = 0;
+    let currentPanasItem = null;
 
-        // Initialize PANAS options buttons once
-        panasOptionsDiv.innerHTML = PANAS_OPTIONS.map(option => `
-            <button class="panas-option-btn" 
-                    onclick="recordPanasResponse('${option.value}')">
-                <span class="panas-option-en">${option.en}</span>
-                <span class="panas-option-ru">${option.ru}</span>
-            </button>
-        `).join('');
+    let phq9Responses = [];
+    let currentPhq9Index = 0;
+    let phq9StartTime;
 
-        startBtn.addEventListener('click', startTask);
-        startPanasBtn.addEventListener('click', startPanas);
-        startCombinedBtn.addEventListener('click', () => {
-            isCombinedTest = true;
-            startPanas();
-        });
-        restartBtn.addEventListener('click', resetTask);
-        taskScreen.addEventListener('mousedown', onTaskScreenMouseDown);
+    // DOM Elements
+    const startScreen = document.getElementById('start-screen');
+    const taskScreen = document.getElementById('task-screen');
+    const panasScreen = document.getElementById('panas-screen');
+    const phq9Screen = document.getElementById('phq9-screen');
+    const endScreen = document.getElementById('end-screen');
 
-        function log_event(event) {
-            _EVENTS.push([event, (Date.now() - taskStartTime)]);
+    const testDurationInput = document.getElementById('test-duration');
+    const minDelayInput = document.getElementById('min-delay');
+    const maxDelayInput = document.getElementById('max-delay');
+    const startBtn = document.getElementById('start-btn');
+    const startPanasBtn = document.getElementById('start-panas-btn');
+    const startCombinedBtn = document.getElementById('start-combined-btn');
+    const startPhq9Btn = document.getElementById('start-phq9-btn');
+    const restartBtn = document.getElementById('restart-btn');
+    const stimulus = document.getElementById('stimulus');
+    const results = document.getElementById('results');
+    const fullReactionTimes = document.getElementById('full-reaction-times');
+
+    const panasWordEn = document.getElementById('panas-word-en');
+    const panasWordRu = document.getElementById('panas-word-ru');
+    const panasOptionsDiv = document.getElementById('panas-options');
+
+    const phq9QuestionEn = document.getElementById('phq9-question-en');
+    const phq9QuestionRu = document.getElementById('phq9-question-ru');
+    const phq9OptionsDiv = document.getElementById('phq9-options');
+
+    // Test Items
+    const PANAS_ITEMS = [
+      { en: "Interested", ru: "Увлеченный" },
+      { en: "Distressed", ru: "Подавленный" },
+      { en: "Excited", ru: "Радостный" },
+      { en: "Upset", ru: "Расстроенный" },
+      { en: "Strong", ru: "Полный сил" },
+      { en: "Guilty", ru: "Виноватый" },
+      { en: "Scared", ru: "Испуганный" },
+      { en: "Hostile", ru: "Злой" },
+      { en: "Enthusiastic", ru: "Заинтересованный" },
+      { en: "Proud", ru: "Уверенный" },
+      { en: "Irritable", ru: "Раздраженный" },
+      { en: "Alert", ru: "Сосредоточенный" },
+      { en: "Ashamed", ru: "Стыдящийся" },
+      { en: "Inspired", ru: "Вдохновленный" },
+      { en: "Nervous", ru: "Нервный" },
+      { en: "Determined", ru: "Решительный" },
+      { en: "Attentive", ru: "Внимательный" },
+      { en: "Jittery", ru: "Беспокойный" },
+      { en: "Active", ru: "Бодрый" },
+      { en: "Afraid", ru: "Тревожный" }
+    ];
+
+    const PANAS_OPTIONS = [
+      { value: 1, en: "Very slightly or not at all", ru: "Почти или совсем нет" },
+      { value: 2, en: "A little", ru: "Немного" },
+      { value: 3, en: "Moderately", ru: "Умеренно" },
+      { value: 4, en: "Quite a bit", ru: "Значительно" },
+      { value: 5, en: "Extremely", ru: "Очень сильно" }
+    ];
+
+    const PHQ9_ITEMS = [
+      { en: "Little interest or pleasure in doing things", ru: "Мало интереса или удовольствия от занятий" },
+      { en: "Feeling down, depressed, or hopeless", ru: "Чувство уныния, депрессии или безнадежности" },
+      { en: "Trouble falling or staying asleep, or sleeping too much", ru: "Проблемы с засыпанием, поддержанием сна или чрезмерный сон" },
+      { en: "Feeling tired or having little energy", ru: "Чувство усталости или недостатка энергии" },
+      { en: "Poor appetite or overeating", ru: "Плохой аппетит или переедание" },
+      { en: "Feeling bad about yourself – or that you are a failure or have let yourself or your family down", ru: "Негативное мнение о себе, чувство неудачи или разочарования в себе или в своей семье" },
+      { en: "Trouble concentrating on things, such as reading the newspaper or watching television", ru: "Трудности с концентрацией, например, при чтении или просмотре телевизора" },
+      { en: "Moving or speaking so slowly that other people could have noticed. Or the opposite – being so fidgety or restless that you have been moving around a lot more than usual", ru: "Замедление движений или речи, заметное для других, или, наоборот, гиперактивность" },
+      { en: "Thoughts that you would be better off dead or of hurting yourself in some way", ru: "Мысли о том, что лучше умереть, или о причинении себе вреда" }
+    ];
+
+    const PHQ9_OPTIONS = [
+      { value: 0, en: "Not at all", ru: "Совсем не" },
+      { value: 1, en: "Several days", ru: "Несколько дней" },
+      { value: 2, en: "More than half the days", ru: "Более половины дней" },
+      { value: 3, en: "Nearly every day", ru: "Почти каждый день" }
+    ];
+
+    // Initialize PANAS options buttons with number value
+    panasOptionsDiv.innerHTML = PANAS_OPTIONS.map(option => `
+      <button class="panas-option-btn" onclick="recordPanasResponse('${option.value}')">
+        <span class="panas-option-num">${option.value}:</span>
+        <span class="panas-option-en">${option.en}</span><br>
+        <span class="panas-option-ru">${option.ru}</span>
+      </button>
+    `).join('');
+
+    // Initialize PHQ-9 options buttons (with number values for consistency)
+    phq9OptionsDiv.innerHTML = PHQ9_OPTIONS.map(option => `
+      <button class="panas-option-btn" onclick="recordPhq9Response('${option.value}')">
+        <span class="panas-option-num">${option.value}:</span>
+        <span class="panas-option-en">${option.en}</span><br>
+        <span class="panas-option-ru">${option.ru}</span>
+      </button>
+    `).join('');
+
+    // Event Listeners
+    startBtn.addEventListener('click', startTask);
+    startPanasBtn.addEventListener('click', startPanas);
+    startCombinedBtn.addEventListener('click', () => {
+      isCombinedTest = true;
+      startPanas();
+    });
+    startPhq9Btn.addEventListener('click', startPhq9);
+    restartBtn.addEventListener('click', resetTask);
+    taskScreen.addEventListener('mousedown', onTaskScreenMouseDown);
+
+    // Functions for logging events
+    function log_event(event) {
+      _EVENTS.push([event, (Date.now() - taskStartTime)]);
+    }
+
+    // PVT Task functions
+    function onTaskScreenMouseDown() {
+      let now = Date.now();
+      clickTimes.push(now - taskStartTime);
+      if (CLICK_NOW) {
+        log_event('click');
+        const reactionTime = now - startTime;
+        reactionTimes.push(reactionTime);
+        scheduleStimulus();
+      } else {
+        log_event('false_click');
+      }
+    }
+
+    function setPreset(duration, minRest, maxRest) {
+      testDurationInput.value = duration;
+      minDelayInput.value = minRest;
+      maxDelayInput.value = maxRest;
+    }
+
+    function startTask() {
+      testDuration = parseInt(testDurationInput.value) || 60;
+      minDelay = parseInt(minDelayInput.value) || 2000;
+      maxDelay = parseInt(maxDelayInput.value) || 10000;
+
+      reactionTimes = [];
+      delays = [];
+      clickTimes = [];
+      _EVENTS = [];
+
+      startScreen.style.display = 'none';
+      taskScreen.style.display = 'block';
+
+      taskStartTime = Date.now();
+      log_event('pvt_start');
+      startTime = Date.now();
+      scheduleStimulus();
+
+      taskEndTimeout = setTimeout(endTask, testDuration * 1000);
+    }
+
+    function scheduleStimulus() {
+      const delay = Math.random() * (maxDelay - minDelay) + minDelay;
+      delays.push(Math.round(delay));
+
+      stimulus.textContent = "Get Ready...";
+      stimulus.style.color = '';
+      CLICK_NOW = false;
+
+      clearTimeout(stimulusTimeout);
+      stimulusTimeout = setTimeout(() => {
+        stimulus.textContent = "Click Now!";
+        stimulus.style.color = 'red';
+        CLICK_NOW = true;
+        startTime = Date.now();
+        log_event('stimulus');
+      }, delay);
+    }
+
+    // PANAS functions
+    function startPanas() {
+      startScreen.style.display = 'none';
+      panasScreen.style.display = 'block';
+      panasResponses = [];
+      currentPanasIndex = 0;
+      taskStartTime = Date.now();
+      panasStartTime = Date.now();
+      _EVENTS = [];
+      showNextPanasItem();
+    }
+
+    function showNextPanasItem() {
+      if (currentPanasIndex >= PANAS_ITEMS.length) {
+        panasScreen.style.display = 'none';
+        if (isCombinedTest) {
+          startTask();
+        } else {
+          endTask();
+        }
+        return;
+      }
+      currentPanasItem = PANAS_ITEMS[currentPanasIndex];
+      panasWordEn.textContent = currentPanasItem.en;
+      panasWordRu.textContent = currentPanasItem.ru;
+    }
+
+    function recordPanasResponse(value) {
+      if (!currentPanasItem) return;
+      const timestamp = Date.now() - panasStartTime;
+      panasResponses.push([currentPanasItem.en, parseInt(value), timestamp]);
+      _EVENTS.push(['panas_response_' + currentPanasItem.en, Date.now() - taskStartTime]);
+      currentPanasIndex++;
+      showNextPanasItem();
+    }
+
+    // PHQ-9 functions
+    function startPhq9() {
+      startScreen.style.display = 'none';
+      phq9Screen.style.display = 'block';
+      phq9Responses = [];
+      currentPhq9Index = 0;
+      phq9StartTime = Date.now();
+      _EVENTS = [];
+      showNextPhq9Item();
+    }
+
+    function showNextPhq9Item() {
+      if (currentPhq9Index >= PHQ9_ITEMS.length) {
+        phq9Screen.style.display = 'none';
+        endPhq9();
+        return;
+      }
+      const currentItem = PHQ9_ITEMS[currentPhq9Index];
+      phq9QuestionEn.textContent = currentItem.en;
+      phq9QuestionRu.textContent = currentItem.ru;
+    }
+
+    function recordPhq9Response(value) {
+      const currentItem = PHQ9_ITEMS[currentPhq9Index];
+      if (!currentItem) return;
+      const timestamp = Date.now() - phq9StartTime;
+      phq9Responses.push([currentItem.en, parseInt(value), timestamp]);
+      _EVENTS.push(['phq9_response_' + currentItem.en, Date.now() - phq9StartTime]);
+      currentPhq9Index++;
+      showNextPhq9Item();
+    }
+
+    // End Task function for PVT and PANAS
+    function endTask() {
+      clearTimeout(stimulusTimeout);
+      clearTimeout(taskEndTimeout);
+
+      taskScreen.style.display = 'none';
+      endScreen.style.display = 'block';
+      CLICK_NOW = false;
+
+      let resultData = {
+        test_datetime: (new Date()).toLocaleString(),
+        events: _EVENTS
+      };
+
+      if (reactionTimes.length > 0) {
+        const sortedTimes = [...reactionTimes].sort((a, b) => a - b);
+        const filteredTimes = sortedTimes.slice(
+          Math.ceil(reactionTimes.length * 0.05),
+          Math.floor(reactionTimes.length * 0.95)
+        );
+        const averageTime = (filteredTimes.length ? (filteredTimes.reduce((a, b) => a + b, 0) / filteredTimes.length) : 0).toFixed(2);
+
+        results.textContent = `Average Reaction Time: ${averageTime} ms (${filteredTimes.length} trials, ${reactionTimes.length} trials minus top and bottom 5%)`;
+
+        resultData = {
+          ...resultData,
+          test_type: isCombinedTest ? 'PANAS+PVT' : 'PVT',
+          averageReactionTime: `${averageTime} ms`,
+          testDuration: `${testDuration} seconds`,
+          minRestDuration: `${minDelay} ms`,
+          maxRestDuration: `${maxDelay} ms`,
+          totalTrials: reactionTimes.length,
+          filteredTrials: filteredTimes.length,
+          reactionTimes: reactionTimes
+        };
+      }
+
+      if (panasResponses.length > 0) {
+        const positiveScore = (PANAS_ITEMS.filter(item => 
+          ["Interested", "Excited", "Strong", "Enthusiastic", "Proud", "Alert", "Inspired", "Determined", "Attentive", "Active"].includes(item.en)
+        ).map(item => {
+          const response = panasResponses.find(r => r[0] === item.en);
+          return response ? response[1] : 0;
+        }).reduce((a, b) => a + b, 0) / 10);
+
+        const negativeScore = (PANAS_ITEMS.filter(item => 
+          ["Distressed", "Upset", "Guilty", "Scared", "Hostile", "Irritable", "Ashamed", "Nervous", "Jittery", "Afraid"].includes(item.en)
+        ).map(item => {
+          const response = panasResponses.find(r => r[0] === item.en);
+          return response ? response[1] : 0;
+        }).reduce((a, b) => a + b, 0) / 10);
+
+        if (reactionTimes.length === 0) {
+          results.textContent = `PANAS Results - Positive: ${positiveScore.toFixed(2)}, Negative: ${negativeScore.toFixed(2)}`;
         }
 
-        function onTaskScreenMouseDown() {
-            var now = Date.now();
-            clickTimes.push(now - taskStartTime);
-            if (CLICK_NOW) {
-                log_event('click');
-                const reactionTime = now - startTime;
-                reactionTimes.push(reactionTime);
-                scheduleStimulus();
-            } else {
-                log_event('false_click');
-            }
+        resultData = {
+          ...resultData,
+          test_type: reactionTimes.length > 0 ? 'PANAS+PVT' : 'PANAS',
+          panasResponses: panasResponses,
+          panasPositiveScore: positiveScore.toFixed(2),
+          panasNegativeScore: negativeScore.toFixed(2)
+        };
+      }
+
+      const reactionTimesJSON = customFormatter(resultData);
+      fullReactionTimes.textContent = `Full Results:\n${reactionTimesJSON}`;
+
+      navigator.clipboard.writeText(reactionTimesJSON).then(() => {
+        alert("Results JSON copied to clipboard!");
+      }).catch(err => {
+        console.error("Could not copy JSON to clipboard: ", err);
+      });
+
+      sendMessage(reactionTimesJSON, [resultData.test_type, 'json']);
+      isCombinedTest = false;
+    }
+
+    // End PHQ-9 test function (excluding events)
+    function endPhq9() {
+      endScreen.style.display = 'block';
+      let totalScore = phq9Responses.reduce((sum, response) => sum + response[1], 0);
+      results.textContent = `PHQ-9 Total Score: ${totalScore} (out of 27)`;
+      let resultData = {
+        test_datetime: (new Date()).toLocaleString(),
+        test_type: 'PHQ-9',
+        phq9Responses: phq9Responses,
+        phq9TotalScore: totalScore
+      };
+      const resultJSON = customFormatter(resultData);
+      fullReactionTimes.textContent = `Full Results:\n${resultJSON}`;
+
+      navigator.clipboard.writeText(resultJSON).then(() => {
+        alert("Results JSON copied to clipboard!");
+      }).catch(err => {
+        console.error("Could not copy JSON to clipboard: ", err);
+      });
+
+      sendMessage(resultJSON, [resultData.test_type, 'json']);
+    }
+
+    function resetTask() {
+      endScreen.style.display = 'none';
+      startScreen.style.display = 'block';
+    }
+
+    // Custom JSON Formatter
+    function customFormatter(obj) {
+      function formatValue(value, indent = '') {
+        if (Array.isArray(value)) {
+          const items = value.map(item => formatValue(item, indent)).join(', ');
+          return `[${items}]`;
         }
-
-        function setPreset(duration, minRest, maxRest) {
-            testDurationInput.value = duration;
-            minDelayInput.value = minRest;
-            maxDelayInput.value = maxRest;
+        if (typeof value === 'object' && value !== null) {
+          const nextIndent = indent + '  ';
+          const items = Object.entries(value).map(([key, val]) => 
+            `${nextIndent}"${key}": ${formatValue(val, nextIndent)}`
+          ).join(',\n');
+          return `{\n${items}\n${indent}}`;
         }
-
-        function startTask() {
-            testDuration = parseInt(testDurationInput.value) || 60;
-            minDelay = parseInt(minDelayInput.value) || 2000;
-            maxDelay = parseInt(maxDelayInput.value) || 10000;
-
-            reactionTimes = [];
-            delays = [];
-            clickTimes = [];
-            _EVENTS = _EVENTS.length ? _EVENTS : [];
-
-            startScreen.style.display = 'none';
-            taskScreen.style.display = 'block';
-
-            taskStartTime = taskStartTime || Date.now();
-            log_event('pvt_start'); // Added PVT start event
-            startTime = Date.now();
-            scheduleStimulus();
-
-            taskEndTimeout = setTimeout(endTask, testDuration * 1000);
-        }
-
-        function scheduleStimulus() {
-            const delay = Math.random() * (maxDelay - minDelay) + minDelay;
-            delays.push(Math.round(delay));
-
-            stimulus.textContent = "Get Ready...";
-            stimulus.style.color = '';
-            CLICK_NOW = false;
-
-            clearTimeout(stimulusTimeout);
-            stimulusTimeout = setTimeout(() => {
-                stimulus.textContent = "Click Now!";
-                stimulus.style.color = 'red';
-                CLICK_NOW = true;
-                startTime = Date.now();
-                log_event('stimulus');
-            }, delay);
-        }
-
-        function startPanas() {
-            startScreen.style.display = 'none';
-            panasScreen.style.display = 'block';
-            panasResponses = []; // Reset to empty array
-            currentPanasIndex = 0;
-            taskStartTime = Date.now();
-            panasStartTime = Date.now();
-            _EVENTS = [];
-            showNextPanasItem();
-        }
-
-        function showNextPanasItem() {
-            if (currentPanasIndex >= PANAS_ITEMS.length) {
-                panasScreen.style.display = 'none';
-                if (isCombinedTest) {
-                    startTask();
-                } else {
-                    endTask();
-                }
-                return;
-            }
-
-            currentPanasItem = PANAS_ITEMS[currentPanasIndex];
-            panasWordEn.textContent = currentPanasItem.en;
-            panasWordRu.textContent = currentPanasItem.ru;
-        }
-
-        function recordPanasResponse(value) {
-            if (!currentPanasItem) return;
-            const timestamp = Date.now() - panasStartTime;
-            panasResponses.push([currentPanasItem.en, parseInt(value), timestamp]); // New format
-            _EVENTS.push(['panas_response_' + currentPanasItem.en, Date.now() - taskStartTime]);
-            currentPanasIndex++;
-            showNextPanasItem();
-        }
-
-        function mean(arr) {
-            return arr.length ? (arr.reduce((a, b) => a + b, 0) / arr.length) : 0;
-        }
-
-        function customFormatter(obj) {
-            function formatValue(value, indent = '') {
-                if (Array.isArray(value)) {
-                    const items = value.map(item => formatValue(item, indent)).join(', ');
-                    return `[${items}]`;
-                }
-                if (typeof value === 'object' && value !== null) {
-                    const nextIndent = indent + '  ';
-                    const items = Object.entries(value).map(([key, val]) => 
-                        `${nextIndent}"${key}": ${formatValue(val, nextIndent)}`
-                    ).join(',\n');
-                    return `{\n${items}\n${indent}}`;
-                }
-                if (typeof value === 'string') return `"${value}"`;
-                return value;
-            }
-            return formatValue(obj);
-        }
-
-        function endTask() {
-            clearTimeout(stimulusTimeout);
-            clearTimeout(taskEndTimeout);
-
-            taskScreen.style.display = 'none';
-            endScreen.style.display = 'block';
-            CLICK_NOW = false;
-
-            let resultData = {
-                test_datetime: (new Date).toLocaleString(),
-                events: _EVENTS
-            };
-
-            if (reactionTimes.length > 0) { // PVT results
-                const sortedTimes = [...reactionTimes].sort((a, b) => a - b);
-                const filteredTimes = sortedTimes.slice(
-                    Math.ceil(reactionTimes.length * 0.05),
-                    Math.floor(reactionTimes.length * 0.95)
-                );
-                const averageTime = mean(filteredTimes).toFixed(2);
-
-                results.textContent = `Average Reaction Time: ${averageTime} ms (${filteredTimes.length} trials, ${reactionTimes.length} trials minus top and bottom 5%)`;
-
-                resultData = {
-                    ...resultData,
-                    test_type: isCombinedTest ? 'Combined PVT' : 'PVT',
-                    averageReactionTime: `${averageTime} ms`,
-                    testDuration: `${testDuration} seconds`,
-                    minRestDuration: `${minDelay} ms`,
-                    maxRestDuration: `${maxDelay} ms`,
-                    totalTrials: reactionTimes.length,
-                    filteredTrials: filteredTimes.length,
-                    reactionTimes: reactionTimes
-                };
-            }
-
-            if (panasResponses.length > 0) { // PANAS results
-                const positiveScore = mean(PANAS_ITEMS.filter(item => 
-                    ["Interested", "Excited", "Strong", "Enthusiastic", "Proud", 
-                     "Alert", "Inspired", "Determined", "Attentive", "Active"]
-                    .includes(item.en)).map(item => {
-                        const response = panasResponses.find(r => r[0] === item.en);
-                        return response ? response[1] : 0;
-                    }));
-                const negativeScore = mean(PANAS_ITEMS.filter(item => 
-                    ["Distressed", "Upset", "Guilty", "Scared", "Hostile", 
-                     "Irritable", "Ashamed", "Nervous", "Jittery", "Afraid"]
-                    .includes(item.en)).map(item => {
-                        const response = panasResponses.find(r => r[0] === item.en);
-                        return response ? response[1] : 0;
-                    }));
-
-                if (reactionTimes.length === 0) { // standalone PANAS
-                    results.textContent = `PANAS Results - Positive: ${positiveScore.toFixed(2)}, Negative: ${negativeScore.toFixed(2)}`;
-                }
-
-                resultData = {
-                    ...resultData,
-                    test_type: reactionTimes.length > 0 ? 'Combined PANAS + PVT' : 'PANAS',
-                    panasResponses: panasResponses, // Already in new format
-                    panasPositiveScore: positiveScore.toFixed(2),
-                    panasNegativeScore: negativeScore.toFixed(2)
-                };
-            }
-
-            const reactionTimesJSON = customFormatter(resultData);
-            fullReactionTimes.textContent = `Full Results:\n${reactionTimesJSON}`;
-
-            navigator.clipboard.writeText(reactionTimesJSON).then(() => {
-                alert("Results JSON copied to clipboard!");
-            }).catch(err => {
-                console.error("Could not copy JSON to clipboard: ", err);
-            });
-
-            sendMessage(reactionTimesJSON, [resultData.test_type, 'json']);
-            isCombinedTest = false;
-        }
-
-        function resetTask() {
-            endScreen.style.display = 'none';
-            startScreen.style.display = 'block';
-        }
-    </script>
+        if (typeof value === 'string') return `"${value}"`;
+        return value;
+      }
+      return formatValue(obj);
+    }
+  </script>
 </body>
 </html>
