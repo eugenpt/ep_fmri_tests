@@ -139,7 +139,7 @@
         let taskStartTime;
         let _EVENTS = [];
         let CLICK_NOW = false;
-        let panasResponses = {};
+        let panasResponses = []; // Changed to array
         let panasStartTime;
         let isCombinedTest = false;
         let currentPanasIndex = 0;
@@ -250,6 +250,7 @@
             taskScreen.style.display = 'block';
 
             taskStartTime = taskStartTime || Date.now();
+            log_event('pvt_start'); // Added PVT start event
             startTime = Date.now();
             scheduleStimulus();
 
@@ -277,7 +278,7 @@
         function startPanas() {
             startScreen.style.display = 'none';
             panasScreen.style.display = 'block';
-            panasResponses = {};
+            panasResponses = []; // Reset to empty array
             currentPanasIndex = 0;
             taskStartTime = Date.now();
             panasStartTime = Date.now();
@@ -303,10 +304,8 @@
 
         function recordPanasResponse(value) {
             if (!currentPanasItem) return;
-            panasResponses[currentPanasItem.en] = {
-                value: parseInt(value),
-                timestamp: Date.now() - panasStartTime
-            };
+            const timestamp = Date.now() - panasStartTime;
+            panasResponses.push([currentPanasItem.en, parseInt(value), timestamp]); // New format
             _EVENTS.push(['panas_response_' + currentPanasItem.en, Date.now() - taskStartTime]);
             currentPanasIndex++;
             showNextPanasItem();
@@ -371,15 +370,21 @@
                 };
             }
 
-            if (Object.keys(panasResponses).length > 0) { // PANAS results
+            if (panasResponses.length > 0) { // PANAS results
                 const positiveScore = mean(PANAS_ITEMS.filter(item => 
                     ["Interested", "Excited", "Strong", "Enthusiastic", "Proud", 
                      "Alert", "Inspired", "Determined", "Attentive", "Active"]
-                    .includes(item.en)).map(item => panasResponses[item.en]?.value || 0));
+                    .includes(item.en)).map(item => {
+                        const response = panasResponses.find(r => r[0] === item.en);
+                        return response ? response[1] : 0;
+                    }));
                 const negativeScore = mean(PANAS_ITEMS.filter(item => 
                     ["Distressed", "Upset", "Guilty", "Scared", "Hostile", 
                      "Irritable", "Ashamed", "Nervous", "Jittery", "Afraid"]
-                    .includes(item.en)).map(item => panasResponses[item.en]?.value || 0));
+                    .includes(item.en)).map(item => {
+                        const response = panasResponses.find(r => r[0] === item.en);
+                        return response ? response[1] : 0;
+                    }));
 
                 if (reactionTimes.length === 0) { // standalone PANAS
                     results.textContent = `PANAS Results - Positive: ${positiveScore.toFixed(2)}, Negative: ${negativeScore.toFixed(2)}`;
@@ -388,7 +393,7 @@
                 resultData = {
                     ...resultData,
                     test_type: reactionTimes.length > 0 ? 'Combined PANAS + PVT' : 'PANAS',
-                    panasResponses: panasResponses,
+                    panasResponses: panasResponses, // Already in new format
                     panasPositiveScore: positiveScore.toFixed(2),
                     panasNegativeScore: negativeScore.toFixed(2)
                 };
