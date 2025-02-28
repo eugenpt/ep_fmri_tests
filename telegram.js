@@ -101,6 +101,18 @@ function ensureJSONString(value) {
     }
 }
 
+function prepHash(hash){
+    return (hash[0]=='#'?'':'#') + hash.replaceAll(/[^#a-zA-Z0-9]/g,'_')
+}
+
+function prepHashs(hashs){
+   if (hashs.length==1){
+        return prepHash(hashs[0])+' ';
+    } else {
+        return '['+hashs.map(s=>prepHash(s)).join(' ')+']\n';
+    }
+}
+
 function sendMessage(msg, hashs){
   msg = ensureJSONString(msg);
   if(msg==null){
@@ -121,8 +133,7 @@ function sendMessage(msg, hashs){
     return
   }
 
-  var text = ((hashs.length==1)?'#'+hashs[0]+' ':'['+hashs.map(s=>'#'+s).join(' ')+']\n') + msg
-
+  var text = prepHashs(hashs) + msg;
   text = escapeMarkdownV2(text);
 
   return telegramAPI('sendMessage',{
