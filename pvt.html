@@ -2,220 +2,61 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <title>Psychomotor Vigilance Task (PVT), PANAS & PHQ-9</title>
-  <style>
-    body, html {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      overflow: hidden;
-    }
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-/*      min-height: 100vh;*/
-    }
-    .container {
-      background: white;
-      padding: 20px;
-      margin: 20px;
-      border-radius: 10px;
-      max-width: 800px;
-      width: 100%;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      text-align: center;
-    }
-    h1 {
-      margin-top: 0;
-    }
-    button {
-      border: none;
-      border-radius: 8px;
-      background-color: #4CAF50;
-      color: white;
-      padding: 10px 20px;
-      font-size: 1em;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-      margin: 5px;
-    }
-    button:hover {
-      background-color: #45a049;
-    }
-    #preset-buttons button {
-      background-color: #2196F3;
-    }
-    #preset-buttons button:hover {
-      background-color: #1976D2;
-    }
-    input[type="number"] {
-      padding: 5px;
-      margin: 5px;
-      font-size: 1em;
-      width: 80px;
-    }
-    /* Hide screens by default */
-    #task-screen, #panas-screen, #phq9-screen, #end-screen {
-      display: none;
-      user-select: none;
-    }
-    /* PVT screen */
-    #task-screen {
-      font-size: 2em;
-    }
-    /* PANAS and PHQ-9 screens */
-    #panas-screen, #phq9-screen {
-      font-size: 1.2em;
-    }
-    #panas-word, #phq9-question {
-      font-size: 2.5em;
-      margin: 20px 0;
-    }
-    .panas-options-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-      margin-top: 20px;
-    }
-    .panas-option-btn {
-      margin: 5px;
-      padding: 10px;
-      font-size: 1em;
-      cursor: pointer;
-      background-color: #b0bec5;
-      border: 2px solid #78909c;
-      border-radius: 5px;
-      width: 90%;
-      max-width: 300px;
-      text-align: center;
-      white-space: normal;
-      line-height: 1.2;
-      transition: background-color 0.3s ease, border-color 0.3s ease;
-      color: #000;
-    }
-    .panas-option-btn:hover {
-      background-color: #90a4ae;
-      border-color: #546e7a;
-    }
 
+  <link rel="stylesheet" type="text/css" href="style.css">
 
-    .brainfog-option-row {
-      display: flex;
-      justify-content: center;
-      flex-wrap: nowrap;
-      gap: 6px;
-      margin: 10px 0;
-    }
-    .brainfog-option-btn {
-      padding: 10px;
-      font-size: 1em;
-      cursor: pointer;
-      background-color: #b0bec5;
-      border: 2px solid #78909c;
-      border-radius: 5px;
-      width: 40px;
-      text-align: center;
-      line-height: 1.2;
-      transition: background-color 0.3s ease, border-color 0.3s ease;
-      color: #000;
-    }
-    .brainfog-option-btn:hover {
-      background-color: #90a4ae;
-      border-color: #546e7a;
-    }
-    .brainfog-label-under {
-      font-size: 0.9em;
-      margin-top: 6px;
-      line-height: 1.3;
-      white-space: pre-line;
-    }
-
-    #results {
-      font-size: 1.2em;
-      margin: 20px 0;
-    }
-    pre {
-      text-align: left;
-      background: #f4f4f9;
-      padding: 10px;
-      border-radius: 5px;
-      overflow-x: auto;
-    }
-
-    /* Progress bar */
-    #progress-bar-container {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 5px;
-/*      background-color: #ccc;*/
-    }
-    #progress-bar {
-      height: 100%;
-      width: 0%;
-      background-color: #4CAF50;
-      transition: width 0.2s linear;
-    }
-    /* Additional styles for Stop button */
-    #stop-btn {
-      background-color: #9e9e9e; /* grey */
-    }
-    #stop-btn:hover {
-      background-color: #d32f2f;
-    }    
-  </style>
-  <script type="text/javascript" src="auth.js"></script>
-  <script type="text/javascript" src="telegram.js"></script>
+  <script src="auth.js"></script>
+  <script src="telegram.js"></script>
 </head>
 <body>
   <div id="progress-bar-container"><div id="progress-bar"></div></div>
-  <!-- Start Screen -->
+
+  <!-- START SCREEN -->
   <div class="container" id="start-screen">
-    <h1>Psychomotor Vigilance Task (PVT), PANAS & PHQ-9</h1>
+    <h1>PVT, PANAS & PHQ-9</h1>
+
     <div>
-      <label for="test-duration">Set Test Duration (seconds):</label>
+      <label for="test-duration">Test Duration (s):</label>
       <input type="number" id="test-duration" value="180" min="10" max="1800">
     </div>
     <div>
-      <label for="min-delay">Min Rest Duration (ms):</label>
+      <label for="min-delay">Min Rest (ms):</label>
       <input type="number" id="min-delay" value="2000" min="1000" max="10000">
     </div>
     <div>
-      <label for="max-delay">Max Rest Duration (ms):</label>
+      <label for="max-delay">Max Rest (ms):</label>
       <input type="number" id="max-delay" value="10000" min="2000" max="20000">
     </div>
+
     <div id="preset-buttons">
       <h3>Quick Presets</h3>
-      <button onclick="setPreset(60, 2000, 5000)">1 min Test</button>
-      <button onclick="setPreset(120, 2000, 10000)">2 min Test</button>
-      <button onclick="setPreset(180, 2000, 10000)">3 min Test</button>
-      <button onclick="setPreset(240, 2000, 10000)">4 min Test</button>
-      <button onclick="setPreset(300, 2000, 10000)">5 min Test</button>
+      <button class="preset-btn" data-duration="60"  data-min-delay="2000"  data-max-delay="5000">1 min</button>
+      <button class="preset-btn" data-duration="120" data-min-delay="2000"  data-max-delay="10000">2 min</button>
+      <button class="preset-btn" data-duration="180" data-min-delay="2000"  data-max-delay="10000">3 min</button>
+      <button class="preset-btn" data-duration="240" data-min-delay="2000"  data-max-delay="10000">4 min</button>
+      <button class="preset-btn" data-duration="300" data-min-delay="2000"  data-max-delay="10000">5 min</button>
     </div>
+
     <div>
       <button id="start-btn">Start PVT</button>
       <button id="start-panas-btn">Start PANAS</button>
-      <button id="start-combined-btn">Start Combined (PANAS + PVT)</button>
+      <button id="start-combined-btn">Start Combined (BF→PANAS→PVT)</button>
       <button id="start-phq9-btn">Start PHQ-9</button>
-      <button onclick="startBrainFog()">Start Brain Fog Only</button>
+      <button id="start-brainfog-btn">Start Brain Fog Only</button>
     </div>
   </div>
 
-  <!-- Task Screen (PVT) -->
+  <!-- PVT SCREEN -->
   <div class="container" id="task-screen">
-    <p id="stimulus">Get Ready...</p>
+    <p id="stimulus">Get Ready…</p>
     <button id="stop-btn">Stop Test</button>
   </div>
 
-  <!-- PANAS Screen -->
+  <!-- PANAS SCREEN -->
   <div class="container" id="panas-screen">
-    <p id="panas-header">Indicate how you feel right now / Укажите, как вы чувствуете себя прямо сейчас</p>
+    <p id="panas-header">Indicate how you feel right now</p>
     <div id="panas-word">
       <span id="panas-word-en"></span><br>
       <span id="panas-word-ru"></span>
@@ -223,10 +64,9 @@
     <div id="panas-options" class="panas-options-container"></div>
   </div>
 
-  <!-- PHQ-9 Screen -->
+  <!-- PHQ-9 SCREEN -->
   <div class="container" id="phq9-screen">
-    <p id="phq9-header">PHQ-9: How often have you been bothered by the following problems over the past 2 weeks?<br>
-    PHQ-9: Как часто вас беспокоили следующие проблемы за последние 2 недели?</p>
+    <p id="phq9-header">PHQ-9: How often…</p>
     <div id="phq9-question">
       <span id="phq9-question-en"></span><br>
       <span id="phq9-question-ru"></span>
@@ -234,26 +74,24 @@
     <div id="phq9-options" class="panas-options-container"></div>
   </div>
 
-  <!-- Brain Fog Questionnaire Screen (PANAS-style display) -->
-  <div class="container" id="brainfog-screen" style="display:none;">
-    <p id="brainfog-header">Answer the following questions on a scale from 0 (worst) to 10 (best):<br>
-    Ответьте на следующие вопросы по шкале от 0 (хуже всего) до 10 (лучше всего)</p>
+  <!-- BRAIN FOG SCREEN -->
+  <div class="container" id="brainfog-screen">
+    <p id="brainfog-header">Answer the following…</p>
     <div id="brainfog-question">
-      <span id="brainfog-question-en" style="font-size: 2em;"></span><br>
-      <span id="brainfog-question-ru" style="font-size: 1.2em; color: #555;"></span>
+      <span id="brainfog-question-en"></span><br>
+      <span id="brainfog-question-ru"></span>
     </div>
     <div id="brainfog-options" class="brainfog-option-row"></div>
     <div id="brainfog-hints" class="brainfog-label-under">
-      <div style="display: flex; justify-content: space-between;">
-        <div id="label-left" style="text-align: left; width: 30%;"></div>
-        <div id="label-right" style="text-align: right; width: 30%;"></div>
+      <div style="display:flex;justify-content:space-between">
+        <div id="label-left"></div>
+        <div id="label-right"></div>
       </div>
-      <div id="brainfog-mid-label" style="text-align: center; margin-top: 6px;"></div>
+      <div id="brainfog-mid-label"></div>
     </div>
   </div>
 
-
-  <!-- End Screen -->
+  <!-- END SCREEN -->
   <div class="container" id="end-screen">
     <h1>Task Complete</h1>
     <p id="results"></p>
@@ -261,514 +99,7 @@
     <button id="restart-btn">Restart</button>
   </div>
 
-  <script>
-    // Global Variables
-    let reactionTimes = [];
-    let delays = [];
-    let clickTimes = [];
-    let testDuration = 60;
-    let minDelay = 2000;
-    let maxDelay = 10000;
-    let startTime, stimulusTimeout, taskEndTimeout;
-    let taskStartTime;
-    let _EVENTS = [];
-    let CLICK_NOW = false;
-    let panasResponses = [];
-    let panasStartTime;
-    let isCombinedTest = false;
-    let currentPanasIndex = 0;
-    let currentPanasItem = null;
-
-    let phq9Responses = [];
-    let currentPhq9Index = 0;
-    let phq9StartTime;
-
-    // DOM Elements
-    const startScreen = document.getElementById('start-screen');
-    const taskScreen = document.getElementById('task-screen');
-    const panasScreen = document.getElementById('panas-screen');
-    const phq9Screen = document.getElementById('phq9-screen');
-    const endScreen = document.getElementById('end-screen');
-
-    const testDurationInput = document.getElementById('test-duration');
-    const minDelayInput = document.getElementById('min-delay');
-    const maxDelayInput = document.getElementById('max-delay');
-    const startBtn = document.getElementById('start-btn');
-    const startPanasBtn = document.getElementById('start-panas-btn');
-    const startCombinedBtn = document.getElementById('start-combined-btn');
-    const startPhq9Btn = document.getElementById('start-phq9-btn');
-    const restartBtn = document.getElementById('restart-btn');
-    const stimulus = document.getElementById('stimulus');
-    const results = document.getElementById('results');
-    const fullReactionTimes = document.getElementById('full-reaction-times');
-
-    const panasWordEn = document.getElementById('panas-word-en');
-    const panasWordRu = document.getElementById('panas-word-ru');
-    const panasOptionsDiv = document.getElementById('panas-options');
-
-    const phq9QuestionEn = document.getElementById('phq9-question-en');
-    const phq9QuestionRu = document.getElementById('phq9-question-ru');
-    const phq9OptionsDiv = document.getElementById('phq9-options');
-
-    const brainfogScreen = document.getElementById("brainfog-screen");
-
-
-    // Test Items
-    const PANAS_ITEMS = [
-      { en: "Interested", ru: "Увлеченный" },
-      { en: "Distressed", ru: "Подавленный" },
-      { en: "Excited", ru: "Радостный" },
-      { en: "Upset", ru: "Расстроенный" },
-      { en: "Strong", ru: "Полный сил" },
-      { en: "Guilty", ru: "Виноватый" },
-      { en: "Scared", ru: "Испуганный" },
-      { en: "Hostile", ru: "Злой" },
-      { en: "Enthusiastic", ru: "Заинтересованный" },
-      { en: "Proud", ru: "Уверенный" },
-      { en: "Irritable", ru: "Раздраженный" },
-      { en: "Alert", ru: "Сосредоточенный" },
-      { en: "Ashamed", ru: "Стыдящийся" },
-      { en: "Inspired", ru: "Вдохновленный" },
-      { en: "Nervous", ru: "Нервный" },
-      { en: "Determined", ru: "Решительный" },
-      { en: "Attentive", ru: "Внимательный" },
-      { en: "Jittery", ru: "Беспокойный" },
-      { en: "Active", ru: "Бодрый" },
-      { en: "Afraid", ru: "Тревожный" }
-    ];
-
-    const PANAS_OPTIONS = [
-      { value: 1, en: "Very slightly or not at all", ru: "Почти или совсем нет" },
-      { value: 2, en: "A little", ru: "Немного" },
-      { value: 3, en: "Moderately", ru: "Умеренно" },
-      { value: 4, en: "Quite a bit", ru: "Значительно" },
-      { value: 5, en: "Extremely", ru: "Очень сильно" }
-    ];
-
-    const PHQ9_ITEMS = [
-      { en: "Little interest or pleasure in doing things", ru: "Мало интереса или удовольствия от занятий" },
-      { en: "Feeling down, depressed, or hopeless", ru: "Чувство уныния, депрессии или безнадежности" },
-      { en: "Trouble falling or staying asleep, or sleeping too much", ru: "Проблемы с засыпанием, поддержанием сна или чрезмерный сон" },
-      { en: "Feeling tired or having little energy", ru: "Чувство усталости или недостатка энергии" },
-      { en: "Poor appetite or overeating", ru: "Плохой аппетит или переедание" },
-      { en: "Feeling bad about yourself – or that you are a failure or have let yourself or your family down", ru: "Негативное мнение о себе, чувство неудачи или разочарования в себе или в своей семье" },
-      { en: "Trouble concentrating on things, such as reading the newspaper or watching television", ru: "Трудности с концентрацией, например, при чтении или просмотре телевизора" },
-      { en: "Moving or speaking so slowly that other people could have noticed. Or the opposite – being so fidgety or restless that you have been moving around a lot more than usual", ru: "Замедление движений или речи, заметное для других, или, наоборот, гиперактивность" },
-      { en: "Thoughts that you would be better off dead or of hurting yourself in some way", ru: "Мысли о том, что лучше умереть, или о причинении себе вреда" }
-    ];
-
-    const PHQ9_OPTIONS = [
-      { value: 0, en: "Not at all", ru: "Совсем не" },
-      { value: 1, en: "Several days", ru: "Несколько дней" },
-      { value: 2, en: "More than half the days", ru: "Более половины дней" },
-      { value: 3, en: "Nearly every day", ru: "Почти каждый день" }
-    ];
-
-    // Initialize PANAS options buttons with number value
-    panasOptionsDiv.innerHTML = PANAS_OPTIONS.map(option => `
-      <button class="panas-option-btn" onclick="recordPanasResponse('${option.value}')">
-        <span class="panas-option-num">${option.value}:</span>
-        <span class="panas-option-en">${option.en}</span><br>
-        <span class="panas-option-ru">${option.ru}</span>
-      </button>
-    `).join('');
-
-    // Initialize PHQ-9 options buttons (with number values for consistency)
-    phq9OptionsDiv.innerHTML = PHQ9_OPTIONS.map(option => `
-      <button class="panas-option-btn" onclick="recordPhq9Response('${option.value}')">
-        <span class="panas-option-num">${option.value}:</span>
-        <span class="panas-option-en">${option.en}</span><br>
-        <span class="panas-option-ru">${option.ru}</span>
-      </button>
-    `).join('');
-
-    // Event Listeners
-    startBtn.addEventListener('click', startTask);
-    startPanasBtn.addEventListener('click', startPanas);
-    startCombinedBtn.addEventListener('click', () => {
-      isCombinedTest = true;
-      startBrainFog();
-    });
-    startPhq9Btn.addEventListener('click', startPhq9);
-    restartBtn.addEventListener('click', resetTask);
-    taskScreen.addEventListener('mousedown', onTaskScreenMouseDown);
-
-    // Functions for logging events
-    function log_event(event) {
-      _EVENTS.push([event, (Date.now() - taskStartTime)]);
-    }
-
-    // PVT Task functions
-    function onTaskScreenMouseDown() {
-      let now = Date.now();
-      clickTimes.push(now - taskStartTime);
-      if (CLICK_NOW) {
-        log_event('click');
-        const reactionTime = now - startTime;
-        reactionTimes.push(reactionTime);
-        scheduleStimulus();
-      } else {
-        log_event('false_click');
-      }
-    }
-
-    function setPreset(duration, minRest, maxRest) {
-      testDurationInput.value = duration;
-      minDelayInput.value = minRest;
-      maxDelayInput.value = maxRest;
-    }
-
-    function startTask() {
-      testDuration = parseInt(testDurationInput.value) || 60;
-      minDelay = parseInt(minDelayInput.value) || 2000;
-      maxDelay = parseInt(maxDelayInput.value) || 10000;
-
-      reactionTimes = [];
-      delays = [];
-      clickTimes = [];
-      _EVENTS = [];
-
-      startScreen.style.display = 'none';
-      taskScreen.style.display = 'block';
-
-      taskStartTime = Date.now();
-      log_event('pvt_start');
-      startTime = Date.now();
-      scheduleStimulus();
-      startProgress();
-
-      taskEndTimeout = setTimeout(endTask, testDuration * 1000);
-    }
-
-    function scheduleStimulus() {
-      const delay = Math.random() * (maxDelay - minDelay) + minDelay;
-      delays.push(Math.round(delay));
-
-      stimulus.textContent = "Get Ready...";
-      stimulus.style.color = '';
-      CLICK_NOW = false;
-
-      clearTimeout(stimulusTimeout);
-      stimulusTimeout = setTimeout(() => {
-        stimulus.textContent = "Click Now!";
-        stimulus.style.color = 'red';
-        CLICK_NOW = true;
-        startTime = Date.now();
-        log_event('stimulus');
-      }, delay);
-    }
-
-    let progressBar = document.getElementById('progress-bar');
-    let progressInterval;
-
-    function updateProgressBar() {
-      const elapsed = (Date.now() - taskStartTime) / 1000;
-      const percent = Math.min(100, (elapsed / testDuration) * 100);
-      progressBar.style.width = percent + '%';
-    }
-
-    function startProgress() {
-      updateProgressBar();
-      progressInterval = setInterval(updateProgressBar, 250);
-    }
-
-    function stopProgress() {
-      clearInterval(progressInterval);
-      updateProgressBar();
-    }
-
-
-    // PANAS functions
-    function startPanas() {
-      startScreen.style.display = 'none';
-      panasScreen.style.display = 'block';
-      panasResponses = [];
-      currentPanasIndex = 0;
-      taskStartTime = Date.now();
-      panasStartTime = Date.now();
-      _EVENTS = [];
-      showNextPanasItem();
-    }
-
-    function showNextPanasItem() {
-      if (currentPanasIndex >= PANAS_ITEMS.length) {
-        panasScreen.style.display = 'none';
-        if (isCombinedTest) {
-          startTask();
-        } else {
-          endTask();
-        }
-        return;
-      }
-      currentPanasItem = PANAS_ITEMS[currentPanasIndex];
-      panasWordEn.textContent = currentPanasItem.en;
-      panasWordRu.textContent = currentPanasItem.ru;
-    }
-
-    function recordPanasResponse(value) {
-      if (!currentPanasItem) return;
-      const timestamp = Date.now() - panasStartTime;
-      panasResponses.push([currentPanasItem.en, parseInt(value), timestamp]);
-      _EVENTS.push(['panas_response_' + currentPanasItem.en, Date.now() - taskStartTime]);
-      currentPanasIndex++;
-      showNextPanasItem();
-    }
-
-    // PHQ-9 functions
-    function startPhq9() {
-      startScreen.style.display = 'none';
-      phq9Screen.style.display = 'block';
-      phq9Responses = [];
-      currentPhq9Index = 0;
-      phq9StartTime = Date.now();
-      _EVENTS = [];
-      showNextPhq9Item();
-    }
-
-    function showNextPhq9Item() {
-      if (currentPhq9Index >= PHQ9_ITEMS.length) {
-        phq9Screen.style.display = 'none';
-        endPhq9();
-        return;
-      }
-      const currentItem = PHQ9_ITEMS[currentPhq9Index];
-      phq9QuestionEn.textContent = currentItem.en;
-      phq9QuestionRu.textContent = currentItem.ru;
-    }
-
-    function recordPhq9Response(value) {
-      const currentItem = PHQ9_ITEMS[currentPhq9Index];
-      if (!currentItem) return;
-      const timestamp = Date.now() - phq9StartTime;
-      phq9Responses.push([currentItem.en, parseInt(value), timestamp]);
-      _EVENTS.push(['phq9_response_' + currentItem.en, Date.now() - phq9StartTime]);
-      currentPhq9Index++;
-      showNextPhq9Item();
-    }
-
-    // End Task function for PVT and PANAS
-    function endTask() {
-      clearTimeout(stimulusTimeout);
-      clearTimeout(taskEndTimeout);
-      stopProgress();
-
-      taskScreen.style.display = 'none';
-      endScreen.style.display = 'block';
-      CLICK_NOW = false;
-
-      let resultData = {
-        test_datetime: (new Date()).toLocaleString(),
-        events: _EVENTS
-      };
-
-      if (reactionTimes.length > 0) {
-        const sortedTimes = [...reactionTimes].sort((a, b) => a - b);
-        const filteredTimes = sortedTimes.slice(
-          Math.ceil(reactionTimes.length * 0.05),
-          Math.floor(reactionTimes.length * 0.95)
-        );
-        const averageTime = (filteredTimes.length ? (filteredTimes.reduce((a, b) => a + b, 0) / filteredTimes.length) : 0).toFixed(2);
-
-        results.textContent = `Average Reaction Time: ${averageTime} ms (${filteredTimes.length} trials, ${reactionTimes.length} trials minus top and bottom 5%)`;
-
-        resultData = {
-          ...resultData,
-          test_type: isCombinedTest ? 'PANAS+PVT' : 'PVT',
-          averageReactionTime: `${averageTime} ms`,
-          testDuration: `${testDuration} seconds`,
-          minRestDuration: `${minDelay} ms`,
-          maxRestDuration: `${maxDelay} ms`,
-          totalTrials: reactionTimes.length,
-          filteredTrials: filteredTimes.length,
-          reactionTimes: reactionTimes
-        };
-      }
-
-      if (panasResponses.length > 0) {
-        const positiveScore = (PANAS_ITEMS.filter(item => 
-          ["Interested", "Excited", "Strong", "Enthusiastic", "Proud", "Alert", "Inspired", "Determined", "Attentive", "Active"].includes(item.en)
-        ).map(item => {
-          const response = panasResponses.find(r => r[0] === item.en);
-          return response ? response[1] : 0;
-        }).reduce((a, b) => a + b, 0) / 10);
-
-        const negativeScore = (PANAS_ITEMS.filter(item => 
-          ["Distressed", "Upset", "Guilty", "Scared", "Hostile", "Irritable", "Ashamed", "Nervous", "Jittery", "Afraid"].includes(item.en)
-        ).map(item => {
-          const response = panasResponses.find(r => r[0] === item.en);
-          return response ? response[1] : 0;
-        }).reduce((a, b) => a + b, 0) / 10);
-
-        if (reactionTimes.length === 0) {
-          results.textContent = `PANAS Results - Positive: ${positiveScore.toFixed(2)}, Negative: ${negativeScore.toFixed(2)}`;
-        }
-
-        resultData = {
-          ...resultData,
-          test_type: reactionTimes.length > 0 ? 'PANAS+PVT' : 'PANAS',
-          panasResponses: panasResponses,
-          panasPositiveScore: positiveScore.toFixed(2),
-          panasNegativeScore: negativeScore.toFixed(2)
-        };
-      }
-
-      if (brainFogResponses.length > 0) {
-        resultData = {
-          ...resultData,
-          brainFogResponses: brainFogResponses
-        };
-      }
-
-      resultData.testDuration = ((Date.now() - taskStartTime) / 1000).toFixed(2) + " seconds";
-
-      const reactionTimesJSON = customFormatter(resultData);
-      fullReactionTimes.textContent = `Full Results:\n${reactionTimesJSON}`;
-
-      navigator.clipboard.writeText(reactionTimesJSON).then(() => {
-        alert("Results JSON copied to clipboard!");
-      }).catch(err => {
-        console.error("Could not copy JSON to clipboard: ", err);
-      });
-
-      sendMessage(reactionTimesJSON, [resultData.test_type, 'json']);
-      isCombinedTest = false;
-    }
-
-    // End PHQ-9 test function (excluding events)
-    function endPhq9() {
-      endScreen.style.display = 'block';
-      let totalScore = phq9Responses.reduce((sum, response) => sum + response[1], 0);
-      results.textContent = `PHQ-9 Total Score: ${totalScore} (out of 27)`;
-      let resultData = {
-        test_datetime: (new Date()).toLocaleString(),
-        test_type: 'PHQ-9',
-        phq9Responses: phq9Responses,
-        phq9TotalScore: totalScore
-      };
-      const resultJSON = customFormatter(resultData);
-      fullReactionTimes.textContent = `Full Results:\n${resultJSON}`;
-
-      navigator.clipboard.writeText(resultJSON).then(() => {
-        alert("Results JSON copied to clipboard!");
-      }).catch(err => {
-        console.error("Could not copy JSON to clipboard: ", err);
-      });
-
-      sendMessage(resultJSON, [resultData.test_type, 'json']);
-    }
-
-    function resetTask() {
-      endScreen.style.display = 'none';
-      startScreen.style.display = 'block';
-    }
-
-    // Custom JSON Formatter
-    function customFormatter(obj) {
-      function formatValue(value, indent = '') {
-        if (Array.isArray(value)) {
-          const items = value.map(item => formatValue(item, indent)).join(', ');
-          return `[${items}]`;
-        }
-        if (typeof value === 'object' && value !== null) {
-          const nextIndent = indent + '  ';
-          const items = Object.entries(value).map(([key, val]) => 
-            `${nextIndent}"${key}": ${formatValue(val, nextIndent)}`
-          ).join(',\n');
-          return `{\n${items}\n${indent}}`;
-        }
-        if (typeof value === 'string') return `"${value}"`;
-        return value;
-      }
-      return formatValue(obj);
-    }
-
-
-const brainFogItems = [
-  {
-    key: "clarity",
-    en: "How clear-headed do you feel right now?",
-    ru: "Насколько ясным вы сейчас чувствуете свой ум?",
-    labels: ["Extremely foggy\nКрайне затуманено", "Somewhat clear\nУмеренно ясно", "Completely clear\nПолностью ясно"]
-  },
-  {
-    key: "mentalEnergy",
-    en: "How mentally energetic do you feel right now?",
-    ru: "Насколько умственно бодрым вы себя чувствуете сейчас?",
-    labels: ["Totally exhausted\nПолностью истощён", "Moderately energetic\nУмеренно бодр", "Very energetic\nОчень бодр"]
-  },
-  {
-    key: "concentration",
-    en: "How easy is it for you to concentrate right now?",
-    ru: "Насколько легко вам сейчас сосредоточиться?",
-    labels: ["Very difficult\nОчень трудно", "Moderate effort\nСреднее усилие", "Effortless\nБез усилий"]
-  },
-  {
-    key: "memory",
-    en: "How confident are you in your memory for new information right now?",
-    ru: "Насколько вы уверены в своей памяти на новую информацию прямо сейчас?",
-    labels: ["Very forgetful\nОчень забывчив", "Moderate confidence\nУмеренная уверенность", "Very confident\nОчень уверен"]
-  },
-  {
-    key: "focus",
-    en: "How stable is your focus right now?",
-    ru: "Насколько устойчиво ваше внимание прямо сейчас?",
-    labels: ["Mind constantly wanders\nПостоянно отвлекаюсь", "Some drifting\nИногда отвлекаюсь", "Very stable\nОчень устойчиво"]
-  }
-];
-
-let brainFogResponses = [];
-let currentBrainFogIndex = 0;
-let brainFogStartTime;
-
-function startBrainFog() {
-  startScreen.style.display = 'none';
-  brainfogScreen.style.display = 'block';
-  brainFogResponses = [];
-  currentBrainFogIndex = 0;
-  brainFogStartTime = Date.now();
-  _EVENTS = [];
-  showBrainFogItem();
-}
-
-function showBrainFogItem() {
-  const item = brainFogItems[currentBrainFogIndex];
-  document.getElementById("brainfog-question-en").textContent = item.en;
-  document.getElementById("brainfog-question-ru").textContent = item.ru;
-  document.getElementById("label-left").textContent = "0 – " + item.labels[0];
-  document.getElementById("label-right").textContent = "10 – " + item.labels[2];
-  document.getElementById("brainfog-mid-label").textContent = "5 – " + item.labels[1];
-
-  const container = document.getElementById("brainfog-options");
-  container.innerHTML = '';
-
-  for (let i = 0; i <= 10; i++) {
-    const btn = document.createElement("button");
-    btn.className = "brainfog-option-btn";
-    btn.textContent = i;
-    btn.onclick = () => recordBrainFogResponse(i);
-    container.appendChild(btn);
-  }
-}
-
-function recordBrainFogResponse(value) {
-  const item = brainFogItems[currentBrainFogIndex];
-  const timestamp = Date.now() - brainFogStartTime;
-  brainFogResponses.push([item.key, value, timestamp]);
-  _EVENTS.push(["brainfog_response_" + item.key, timestamp]);
-  currentBrainFogIndex++;
-  if (currentBrainFogIndex >= brainFogItems.length) {
-    brainfogScreen.style.display = 'none';
-    if (isCombinedTest) {
-      startPanas();
-    } else {
-      endTask();
-    }
-  } else {
-    showBrainFogItem();
-  }
-}
-    document.getElementById('stop-btn').addEventListener('click', endTask);
-
-  </script>
+  <!-- load our modules -->
+  <script type="module" src="main.js"></script>
 </body>
 </html>
