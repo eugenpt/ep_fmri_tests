@@ -102,6 +102,39 @@
       background-color: #90a4ae;
       border-color: #546e7a;
     }
+
+
+    .brainfog-option-row {
+      display: flex;
+      justify-content: center;
+      flex-wrap: nowrap;
+      gap: 6px;
+      margin: 10px 0;
+    }
+    .brainfog-option-btn {
+      padding: 10px;
+      font-size: 1em;
+      cursor: pointer;
+      background-color: #b0bec5;
+      border: 2px solid #78909c;
+      border-radius: 5px;
+      width: 40px;
+      text-align: center;
+      line-height: 1.2;
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+      color: #000;
+    }
+    .brainfog-option-btn:hover {
+      background-color: #90a4ae;
+      border-color: #546e7a;
+    }
+    .brainfog-label-under {
+      font-size: 0.9em;
+      margin-top: 6px;
+      line-height: 1.3;
+      white-space: pre-line;
+    }
+
     #results {
       font-size: 1.2em;
       margin: 20px 0;
@@ -170,6 +203,7 @@
       <button id="start-panas-btn">Start PANAS</button>
       <button id="start-combined-btn">Start Combined (PANAS + PVT)</button>
       <button id="start-phq9-btn">Start PHQ-9</button>
+      <button onclick="startBrainFog()">Start Brain Fog Only</button>
     </div>
   </div>
 
@@ -199,6 +233,25 @@
     </div>
     <div id="phq9-options" class="panas-options-container"></div>
   </div>
+
+  <!-- Brain Fog Questionnaire Screen (PANAS-style display) -->
+  <div class="container" id="brainfog-screen" style="display:none;">
+    <p id="brainfog-header">Answer the following questions on a scale from 0 (worst) to 10 (best):<br>
+    Ответьте на следующие вопросы по шкале от 0 (хуже всего) до 10 (лучше всего)</p>
+    <div id="brainfog-question">
+      <span id="brainfog-question-en" style="font-size: 2em;"></span><br>
+      <span id="brainfog-question-ru" style="font-size: 1.2em; color: #555;"></span>
+    </div>
+    <div id="brainfog-options" class="brainfog-option-row"></div>
+    <div id="brainfog-hints" class="brainfog-label-under">
+      <div style="display: flex; justify-content: space-between;">
+        <div id="label-left" style="text-align: left; width: 30%;"></div>
+        <div id="label-right" style="text-align: right; width: 30%;"></div>
+      </div>
+      <div id="brainfog-mid-label" style="text-align: center; margin-top: 6px;"></div>
+    </div>
+  </div>
+
 
   <!-- End Screen -->
   <div class="container" id="end-screen">
@@ -256,6 +309,9 @@
     const phq9QuestionEn = document.getElementById('phq9-question-en');
     const phq9QuestionRu = document.getElementById('phq9-question-ru');
     const phq9OptionsDiv = document.getElementById('phq9-options');
+
+    const brainfogScreen = document.getElementById("brainfog-screen");
+
 
     // Test Items
     const PANAS_ITEMS = [
@@ -331,7 +387,7 @@
     startPanasBtn.addEventListener('click', startPanas);
     startCombinedBtn.addEventListener('click', () => {
       isCombinedTest = true;
-      startPanas();
+      startBrainFog();
     });
     startPhq9Btn.addEventListener('click', startPhq9);
     restartBtn.addEventListener('click', resetTask);
@@ -556,6 +612,13 @@
         };
       }
 
+      if (brainFogResponses.length > 0) {
+        resultData = {
+          ...resultData,
+          brainFogResponses: brainFogResponses
+        };
+      }
+
       resultData.testDuration = ((Date.now() - taskStartTime) / 1000).toFixed(2) + " seconds";
 
       const reactionTimesJSON = customFormatter(resultData);
@@ -619,6 +682,91 @@
       return formatValue(obj);
     }
 
+
+const brainFogItems = [
+  {
+    key: "clarity",
+    en: "How clear-headed do you feel right now?",
+    ru: "Насколько ясным вы сейчас чувствуете свой ум?",
+    labels: ["Extremely foggy\nКрайне затуманено", "Somewhat clear\nУмеренно ясно", "Completely clear\nПолностью ясно"]
+  },
+  {
+    key: "mentalEnergy",
+    en: "How mentally energetic do you feel right now?",
+    ru: "Насколько умственно бодрым вы себя чувствуете сейчас?",
+    labels: ["Totally exhausted\nПолностью истощён", "Moderately energetic\nУмеренно бодр", "Very energetic\nОчень бодр"]
+  },
+  {
+    key: "concentration",
+    en: "How easy is it for you to concentrate right now?",
+    ru: "Насколько легко вам сейчас сосредоточиться?",
+    labels: ["Very difficult\nОчень трудно", "Moderate effort\nСреднее усилие", "Effortless\nБез усилий"]
+  },
+  {
+    key: "memory",
+    en: "How confident are you in your memory for new information right now?",
+    ru: "Насколько вы уверены в своей памяти на новую информацию прямо сейчас?",
+    labels: ["Very forgetful\nОчень забывчив", "Moderate confidence\nУмеренная уверенность", "Very confident\nОчень уверен"]
+  },
+  {
+    key: "focus",
+    en: "How stable is your focus right now?",
+    ru: "Насколько устойчиво ваше внимание прямо сейчас?",
+    labels: ["Mind constantly wanders\nПостоянно отвлекаюсь", "Some drifting\nИногда отвлекаюсь", "Very stable\nОчень устойчиво"]
+  }
+];
+
+let brainFogResponses = [];
+let currentBrainFogIndex = 0;
+let brainFogStartTime;
+
+function startBrainFog() {
+  startScreen.style.display = 'none';
+  brainfogScreen.style.display = 'block';
+  brainFogResponses = [];
+  currentBrainFogIndex = 0;
+  brainFogStartTime = Date.now();
+  _EVENTS = [];
+  showBrainFogItem();
+}
+
+function showBrainFogItem() {
+  const item = brainFogItems[currentBrainFogIndex];
+  document.getElementById("brainfog-question-en").textContent = item.en;
+  document.getElementById("brainfog-question-ru").textContent = item.ru;
+  document.getElementById("label-left").textContent = "0 – " + item.labels[0];
+  document.getElementById("label-right").textContent = "10 – " + item.labels[2];
+  document.getElementById("brainfog-mid-label").textContent = "5 – " + item.labels[1];
+
+  const container = document.getElementById("brainfog-options");
+  container.innerHTML = '';
+
+  for (let i = 0; i <= 10; i++) {
+    const btn = document.createElement("button");
+    btn.className = "brainfog-option-btn";
+    btn.textContent = i;
+    btn.onclick = () => recordBrainFogResponse(i);
+    container.appendChild(btn);
+  }
+}
+
+function recordBrainFogResponse(value) {
+  const item = brainFogItems[currentBrainFogIndex];
+  const timestamp = Date.now() - brainFogStartTime;
+  brainFogResponses.push([item.key, value, timestamp]);
+  _EVENTS.push(["brainfog_response_" + item.key, timestamp]);
+  currentBrainFogIndex++;
+  if (currentBrainFogIndex >= brainFogItems.length) {
+    brainfogScreen.style.display = 'none';
+    if (isCombinedTest) {
+      startPanas();
+    } else {
+      endTask();
+    }
+  } else {
+    showBrainFogItem();
+  }
+}
     document.getElementById('stop-btn').addEventListener('click', endTask);
 
   </script>
