@@ -2,7 +2,7 @@
 import { $, $$, showScreen, logEvent, state } from './utils.js';
 import { endTask } from './results.js';
 
-let stimulus, progressBar, taskScreen, startScreen, inputs, presetButtons;
+let stimulus, progressBar, taskScreen, startScreen, inputs, presetButtons, startTrialsBtn;
 let progressInterval;
 
 export function initPVT() {
@@ -31,6 +31,9 @@ export function initPVT() {
 
   taskScreen.addEventListener('mousedown', onTaskScreenMouseDown);
   $('#stop-btn').addEventListener('click', endTask);
+
+  startTrialsBtn = $('#pvt-start-btn');
+  startTrialsBtn.addEventListener('click', beginTrials);
 }
 
 function onTaskScreenMouseDown() {
@@ -45,6 +48,16 @@ function onTaskScreenMouseDown() {
   }
 }
 
+// NEW helper that really launches the first trial
+function beginTrials() {
+  startTrialsBtn.style.display = 'none';          // hide the button
+  state.taskStartTime = Date.now();
+  logEvent('pvt_start');
+  scheduleStimulus();                             // first trial timer
+  startProgress();                                // progress‑bar loop
+  state.taskEndTimeout = setTimeout(endTask, state.testDuration * 1000);
+}
+
 export function startTask() {
   state.testDuration = +inputs.duration.value || 60;
   state.minDelay     = +inputs.minDelay.value  || 2000;
@@ -56,12 +69,11 @@ export function startTask() {
   state._EVENTS       = [];
 
   showScreen('#task-screen');
-  state.taskStartTime = Date.now();
-  logEvent('pvt_start');
-  scheduleStimulus();
-  startProgress();
-
-  state.taskEndTimeout = setTimeout(endTask, state.testDuration * 1000);
+  /*  Show the in‑screen Start button and wait for the user.
+      The stimulus and timers will start from beginTrials().   */
+  stimulus.textContent = 'Press “Start” when you are ready';
+  stimulus.style.color = '';
+  startTrialsBtn.style.display = 'inline-block';
 }
 
 function scheduleStimulus() {
