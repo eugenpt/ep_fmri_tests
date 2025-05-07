@@ -27,6 +27,7 @@ export function endTask() {
 function buildPVT_PANAS_Result() {
   const out = {
     test_datetime: new Date().toLocaleString(),
+    location: $('#location').value,
     events: state._EVENTS
   };
 
@@ -82,6 +83,7 @@ export function endPhq9() {
   const total = state.phq9Responses.reduce((s,r)=>s+r[1],0);
   const data  = {
     test_datetime: new Date().toLocaleString(),
+    location: $('#location').value,
     test_type: 'PHQ-9',
     phq9Responses: state.phq9Responses,
     phq9TotalScore: total

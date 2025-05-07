@@ -16,6 +16,10 @@ export function initBrainFog() {
     state.isCombinedTest = false;
     startBrainFog();
   });
+  $('#start-combined-btn').addEventListener('click', () => {
+    state.isCombinedTest = true;
+    startBrainFog();
+  });
 }
 
 export function startBrainFog() {

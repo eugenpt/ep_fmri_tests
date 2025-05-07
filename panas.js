@@ -35,13 +35,11 @@ const OPTIONS = [
 
 let currentItemIndex = 0;
 
+let currentITEMS = [];
+
 export function initPANAS() {
   $('#start-panas-btn').addEventListener('click', () => {
     state.isCombinedTest = false;
-    startPANAS();
-  });
-  $('#start-combined-btn').addEventListener('click', () => {
-    state.isCombinedTest = true;
     startPANAS();
   });
   // build option buttons once
@@ -59,6 +57,7 @@ export function initPANAS() {
 export function startPANAS() {
   state.panasResponses = [];
   state.currentPanasIndex = 0;
+  currentITEMS = ITEMS.sort(() => Math.random() - 0.5);
   state._EVENTS = [];
   showScreen('#panas-screen');
   state.panasStartTime = Date.now();
@@ -71,7 +70,7 @@ function showNext() {
     if (state.isCombinedTest) return startTask();
     return endTask();
   }
-  const item = ITEMS[state.currentPanasIndex];
+  const item = currentITEMS[state.currentPanasIndex];
   $('#panas-word-en').textContent = item.en;
   $('#panas-word-ru').textContent = item.ru;
 }
